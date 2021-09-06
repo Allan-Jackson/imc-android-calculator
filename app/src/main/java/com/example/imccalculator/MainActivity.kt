@@ -1,7 +1,6 @@
 package com.example.imccalculator
 
 import android.graphics.Color
-import android.opengl.Visibility
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.PersistableBundle
@@ -12,6 +11,8 @@ import kotlin.math.pow
 //implementando o Click Listener utilizando lambda
 
 class MainActivity : AppCompatActivity() {
+    private var latestImc: Double? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -38,7 +39,32 @@ class MainActivity : AppCompatActivity() {
                 imc < 18.5 || imc > 34.9 -> textResponse.setTextColor(Color.RED)
                 else -> textResponse.setTextColor(Color.GREEN)
             }
+            latestImc = imc
+            setLatestImcView()
         }
     }
 
+    private fun setLatestImcView(){
+        textLatestImc.visibility = View.VISIBLE
+        //utilizando Strings com placeholder ("verbos de formatação" em Go) é o recomendado
+        textLatestImc.text = resources.getString(R.string.latest_imc).format(latestImc)
+    }
+
+    //chamado quando a Activity vai ser destruída por alteração do sistema, e salva o bundle
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putDouble("latest-imc", latestImc?:0.0) //0 se for nulo
+    }
+
+    //executado quando um bundle é recuperado
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+
+        //não é necessário verificar se o bundle é nulo aqui
+        //pois esse método só é chamado quando a Activity é reconstruída pelo sistema
+        //ou seja, o Bundle com certeza existirá, diferente de fazer isso no onCreate
+        //onde a Activity pode estar sendo criada pela primeira vez
+        latestImc = savedInstanceState.getDouble("latest-imc")
+        setLatestImcView()
+    }
 }
