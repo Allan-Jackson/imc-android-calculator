@@ -8,40 +8,15 @@ import android.view.View
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlin.math.pow
 
-//implementando o Click Listener utilizando lambda
+//configurando Click Listener implementado a interface
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), View.OnClickListener {
     private var latestImc: Double? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        setListeners()
-    }
-    private fun setListeners(){
-        buttonCalculate.setOnClickListener{
-            val height = editHeight.text.toString().toDouble()
-            val weight = editWeight.text.toString().toDouble()
-            val imc = weight/ height.pow(2)
-
-            //torna o TextView visível
-            textResponse.visibility = View.VISIBLE
-
-            when{
-                imc < 18.5 -> textResponse.text = "Abaixo do peso"
-                imc < 24.9 -> textResponse.text = "Peso ideal"
-                imc < 29.9 -> textResponse.text = "Levemente acima do peso"
-                imc <  34.9 -> textResponse.text = "Obesidade Grau I"
-                imc < 39.9 -> textResponse.text = "Obesidade Grau II"
-                else -> textResponse.text = "Obesidade Mórbida (Tu vai morreerr)"
-            }
-            when{
-                imc < 18.5 || imc > 34.9 -> textResponse.setTextColor(Color.RED)
-                else -> textResponse.setTextColor(Color.GREEN)
-            }
-            latestImc = imc
-            setLatestImcView()
-        }
+        buttonCalculate.setOnClickListener(this) //seta o clickListener para ser a própria classe que implementa OnClickListener
     }
 
     private fun setLatestImcView(){
@@ -66,5 +41,35 @@ class MainActivity : AppCompatActivity() {
         //onde a Activity pode estar sendo criada pela primeira vez
         latestImc = savedInstanceState.getDouble("latest-imc")
         setLatestImcView()
+    }
+
+    //Esse listener será chamado quando qualquer elemento do layout
+    //receber um clique, por isso é necessário verificar pelo ID
+    //qual elemento está sendo clicado e aplicar a lógica que lhe cabe
+    override fun onClick(view: View) { //view se refere ao elemento que está sendo clicado
+        //só vai se ativar para o botão "buttonCalculate"
+        if(view.id == R.id.buttonCalculate){
+            val height = editHeight.text.toString().toDouble()
+            val weight = editWeight.text.toString().toDouble()
+            val imc = weight/ height.pow(2)
+
+            //torna o TextView visível
+            textResponse.visibility = View.VISIBLE
+
+            when{
+                imc < 18.5 -> textResponse.text = "Abaixo do peso"
+                imc < 24.9 -> textResponse.text = "Peso ideal"
+                imc < 29.9 -> textResponse.text = "Levemente acima do peso"
+                imc <  34.9 -> textResponse.text = "Obesidade Grau I"
+                imc < 39.9 -> textResponse.text = "Obesidade Grau II"
+                else -> textResponse.text = "Obesidade Mórbida (Tu vai morreerr)"
+            }
+            when{
+                imc < 18.5 || imc > 34.9 -> textResponse.setTextColor(Color.RED)
+                else -> textResponse.setTextColor(Color.GREEN)
+            }
+            latestImc = imc
+            setLatestImcView()
+        }
     }
 }
