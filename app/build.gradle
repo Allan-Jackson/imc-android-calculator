@@ -1,8 +1,6 @@
-//necessário atualizar para utilizar View Binding
-
 plugins {
     id 'com.android.application'
-    id 'kotlin-android-extensions'
+    //id 'kotlin-android-extensions' --Kotlin Synthetics
     id 'kotlin-android'
 }
 
@@ -19,6 +17,12 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+
+    //enabling viewbinding feature
+    buildFeatures{
+        viewBinding true
+    }
+
 
     buildTypes {
         release {

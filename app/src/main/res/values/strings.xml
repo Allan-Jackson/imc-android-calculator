@@ -1,7 +1,5 @@
 <resources>
     <string name="app_name">Imc Calculator</string>
     <string name="calculate">Calculate</string>
-
-    <!--  A string é formatada e o placeholder é substituído no código  -->
     <string name="latest_imc">Recente: %.2f</string>
 </resources>

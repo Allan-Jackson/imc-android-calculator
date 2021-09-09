@@ -5,24 +5,32 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.view.View
-import kotlinx.android.synthetic.main.activity_main.*
+import com.example.imccalculator.databinding.ActivityMainBinding
+//import kotlinx.android.synthetic.main.activity_main.* -- import do Kotlin Synthetics
 import kotlin.math.pow
 
-//configurando Click Listener implementado a interface
+//implementação do view binding
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
     private var latestImc: Double? = null
+    private lateinit var binding: ActivityMainBinding //o 'binding' depende do layoutInflater que só existe após a criação do contexto
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        buttonCalculate.setOnClickListener(this) //seta o clickListener para ser a própria classe que implementa OnClickListener
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        binding.buttonCalculate.setOnClickListener(this) //seta o clickListener para ser a própria classe que implementa OnClickListener
+
+        //verifica se o Bundle não é nulo (se não é a primeira vez que a Activity está sendo criada)
+        if(savedInstanceState != null){
+            latestImc = savedInstanceState.getDouble("latest-imc")
+            setLatestImcView()
+        }
     }
 
     private fun setLatestImcView(){
-        textLatestImc.visibility = View.VISIBLE
-        //utilizando Strings com placeholder ("verbos de formatação" em Go) é o recomendado
-        textLatestImc.text = resources.getString(R.string.latest_imc).format(latestImc)
+        binding.textLatestImc.visibility = View.VISIBLE
+        binding.textLatestImc.text = resources.getString(R.string.latest_imc).format(latestImc)
     }
 
     //chamado quando a Activity vai ser destruída por alteração do sistema, e salva o bundle
@@ -31,42 +39,27 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         outState.putDouble("latest-imc", latestImc?:0.0) //0 se for nulo
     }
 
-    //executado quando um bundle é recuperado
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-
-        //não é necessário verificar se o bundle é nulo aqui
-        //pois esse método só é chamado quando a Activity é reconstruída pelo sistema
-        //ou seja, o Bundle com certeza existirá, diferente de fazer isso no onCreate
-        //onde a Activity pode estar sendo criada pela primeira vez
-        latestImc = savedInstanceState.getDouble("latest-imc")
-        setLatestImcView()
-    }
-
-    //Esse listener será chamado quando qualquer elemento do layout
-    //receber um clique, por isso é necessário verificar pelo ID
-    //qual elemento está sendo clicado e aplicar a lógica que lhe cabe
     override fun onClick(view: View) { //view se refere ao elemento que está sendo clicado
+
         //só vai se ativar para o botão "buttonCalculate"
-        if(view.id == R.id.buttonCalculate){
-            val height = editHeight.text.toString().toDouble()
-            val weight = editWeight.text.toString().toDouble()
+        if(view.id == R.id.button_calculate){
+            val height = binding.editHeight.text.toString().toDouble()
+            val weight = binding.editWeight.text.toString().toDouble()
             val imc = weight/ height.pow(2)
 
-            //torna o TextView visível
-            textResponse.visibility = View.VISIBLE
+            binding.textResponse.visibility = View.VISIBLE
 
             when{
-                imc < 18.5 -> textResponse.text = "Abaixo do peso"
-                imc < 24.9 -> textResponse.text = "Peso ideal"
-                imc < 29.9 -> textResponse.text = "Levemente acima do peso"
-                imc <  34.9 -> textResponse.text = "Obesidade Grau I"
-                imc < 39.9 -> textResponse.text = "Obesidade Grau II"
-                else -> textResponse.text = "Obesidade Mórbida (Tu vai morreerr)"
+                imc < 18.5 -> binding.textResponse.text = "Abaixo do peso"
+                imc < 24.9 -> binding.textResponse.text = "Peso ideal"
+                imc < 29.9 -> binding.textResponse.text = "Levemente acima do peso"
+                imc <  34.9 -> binding.textResponse.text = "Obesidade Grau I"
+                imc < 39.9 -> binding.textResponse.text = "Obesidade Grau II"
+                else -> binding.textResponse.text = "Obesidade Mórbida (Tu vai morreerr)"
             }
             when{
-                imc < 18.5 || imc > 34.9 -> textResponse.setTextColor(Color.RED)
-                else -> textResponse.setTextColor(Color.GREEN)
+                imc < 18.5 || imc > 34.9 -> binding.textResponse.setTextColor(Color.RED)
+                else -> binding.textResponse.setTextColor(Color.GREEN)
             }
             latestImc = imc
             setLatestImcView()
